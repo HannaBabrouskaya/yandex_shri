@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Popup</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100%;
+      background: #fff;
+      font: 14px/125% Tahoma;
+    }
+
+    p {
+      margin: 1em 0;
+      text-align: center;
+      display: block;
+    }
+
+    .popup {
+      position: absolute;
+      top: 20px;
+      left: 10px;
+      width: 640px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      display: none;
+      box-shadow: 0 0 40px #ddd;
+    }
+
+    a {
+      padding: 6px 16px;
+      border: 0;
+      border-radius: 2px;
+      -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .3);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, .3);
+      cursor: pointer;
+      background: #444;
+      background: -webkit-linear-gradient(90deg, #515151, #333 48%, #333 52%, #515151 100%);
+      background: -moz-linear-gradient(90deg, #515151, #333 48%, #333 52%, #515151 100%);
+      background: -ms-linear-gradient(90deg, #515151, #333 48%, #333 52%, #515151 100%);
+      background: -o-linear-gradient(90deg, #515151, #333 48%, #333 52%, #515151 100%);
+      background: linear-gradient(90deg, #515151, #333 48%, #333 52%, #515151 100%);
+      color: #fff;
+      text-decoration: none;
+      display: inline-block;
+    }
+  </style>
+  <script type="text/javascript" src="http://yandex.st/jquery/2.1.1/jquery.min.js"></script>
+  <script src="popup.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $('.popup').center();
+    });
+    $(function () {
+      $.fn.extend({
+        center: function () {
+          return this.each(function () {
+            var $this = $(this);
+            var $window = $(window);
+            clearTimeout($this.timerHandle);
+            var top = ($window.height() - $this.height()) / 2 + $window.scrollTop();
+            var left = ($window.width() - $this.width()) / 2 + $window.scrollLeft();
+            clearTimeout(this.timerHandle);
+            this.timerHandle = setTimeout(function () {
+              $this.animate({
+                "top": top,
+                "left": left
+              }, 300);
+              $(window).bind('scroll', function () {
+                $($this).center();
+              });
+              $(window).bind('resize', function () {
+                $($this).center();
+              });
+            }, 200);
+          });
+        }
+      });
+
+      var overlayHeight = $(document).height();
+      var overlayWidth = $(window).width();
+      $('body').prepend('<div id="fader"></div>');
+      $('#fader').css({'position': 'absolute', 'top': '0', 'left': '0', 'background': '#000', 'cursor': 'pointer', 'z-index': '999', 'display': 'none'});
+      $(window).bind('resize', function () {
+        $('#fader').css({'width': ($(document).width()), 'height': ($(document).height())});
+      });
+      $('a[name=popup]').click(function (e) {
+        e.preventDefault();
+        var id = $(this).attr('href');
+        $('#fader').css({'width': overlayWidth, 'height': overlayHeight});
+        $('#fader').fadeTo("slow", 0.7);
+        $(id).css({'z-index': '1000', 'position': 'absolute', 'display': 'none'});
+        $(id).fadeIn(500);
+        $(document).keyup(function (d) {
+          if (d.keyCode == 27) {
+            $('#fader').fadeOut();
+            $(id).fadeOut();
+          }
+        });
+        $('#fader').click(function () {
+          $(this).fadeOut();
+          $(id).fadeOut();
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+<p><a href="#window" name="popup">Popup!</a></p>
+
+<div id="window" class="popup">
+  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's
+    standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a
+    type specimen book.</p>
+</div>
+</body>
+</html>
